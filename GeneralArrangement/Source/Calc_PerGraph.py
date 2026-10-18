@@ -2,8 +2,58 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import numpy as np
 
+def validate_adjacency_matrix(adjacency_matrix):
+    """
+    Verifica que adjacency_matrix corresponda a un grafo simple no dirigido:
+    - Es cuadrada.
+    - Todas las entradas son 0 o 1.
+    - La diagonal es nula (sin lazos).
+    - Es simétrica (grafo no dirigido).
 
+    Lanza ValueError con un mensaje específico si alguna condición falla.
+    """
+    n = len(adjacency_matrix)
+
+    # 1. Debe ser cuadrada.
+    for i, row in enumerate(adjacency_matrix):
+        if len(row) != n:
+            raise ValueError(
+                f"La matriz no es cuadrada: la fila {i} tiene longitud "
+                f"{len(row)}, se esperaba {n}."
+            )
+
+    # 2. Entradas solo 0 o 1.
+    for i in range(n):
+        for j in range(n):
+            val = adjacency_matrix[i][j]
+            if val not in (0, 1):
+                raise ValueError(
+                    f"Entrada no binaria en ({i}, {j}): {val}. "
+                    f"Se esperaban únicamente valores 0 o 1."
+                )
+
+    # 3. Diagonal nula (sin lazos).
+    for i in range(n):
+        if adjacency_matrix[i][i] != 0:
+            raise ValueError(
+                f"La diagonal no es nula: adjacency_matrix[{i}][{i}] = "
+                f"{adjacency_matrix[i][i]}. El grafo no debe tener lazos."
+            )
+
+    # 4. Simetría (grafo no dirigido).
+    for i in range(n):
+        for j in range(i + 1, n):
+            if adjacency_matrix[i][j] != adjacency_matrix[j][i]:
+                raise ValueError(
+                    f"La matriz no es simétrica en ({i}, {j}) vs ({j}, {i}): "
+                    f"{adjacency_matrix[i][j]} != {adjacency_matrix[j][i]}. "
+                    f"Se esperaba un grafo no dirigido."
+                )
+
+    return True
 def enumerate_blocking_sequences(adjacency_matrix):
+    validate_adjacency_matrix(adjacency_matrix)
+    n = len(adjacency_matrix)
     """
     Enumerate all sequential occupation orders on a graph via backtracking.
 
@@ -14,7 +64,6 @@ def enumerate_blocking_sequences(adjacency_matrix):
     Returns a list of (sequence, probability, final_state) tuples, where
     final_state is a 0/1 tuple indicating which nodes ended up occupied.
     """
-    n = len(adjacency_matrix)
     neighbors = {i: [j for j in range(n) if adjacency_matrix[i][j] != 0] for i in range(n)}
 
     results = []
@@ -100,9 +149,9 @@ def analyze_graph_dominance(adjacency_matrix, tolerance=1e-9):
     if d1_holds and d2_holds:
         print("Both cumulative distributions coincide (D_1 and D_2 both hold).")
     elif d1_holds:
-        print("D_1 holds: the static model dominates the sequential model.")
+        print("D_1 holds: the sequential model dominates the static model.")
     elif d2_holds:
-        print("D_2 holds: the sequential model dominates the static model.")
+        print("D_2 holds: the static model dominates the sequential model.")
     else:
         print("Neither D_1 nor D_2 holds: the cumulative distributions cross.")
 
@@ -125,17 +174,3 @@ def analyze_graph_dominance(adjacency_matrix, tolerance=1e-9):
     }
 
 
-""""
-M=[
-  [0, 0, 0, 0, 1, 0, 0, 1],
-  [0, 0, 0, 0, 0, 1, 0, 1],
-  [0, 0, 0, 0, 0, 0, 1, 1],
-  [0, 0, 0, 0, 0, 0, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [0, 1, 0, 0, 0, 0, 0, 1],
-  [0, 0, 1, 1, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 0, 0]
-  ]
-
-analyze_graph_dominance(M)
-"""

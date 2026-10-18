@@ -131,9 +131,9 @@ def verify_d1(adjacency_matrix, tolerance=1e-9, plot=True):
     d1_holds = all(cumulative_stat[i] >= cumulative_seq[i] - tolerance for i in range(len(ks)))
 
     if d1_holds:
-        print("D_1 holds: the static model dominates the sequential model.")
+        print("D_1 holds: the sequential model dominates the static model.")
     else:
-        print("D_1 fails: the static model does not dominate the sequential model for every k.")
+        print("D_1 fails: the sequential model does not dominate the static model for every k.")
         for i, k in enumerate(ks):
             if cumulative_stat[i] < cumulative_seq[i] - tolerance:
                 print(f"  Violated at k = {k}: cumulative_stat = {cumulative_stat[i]:.6f}, "

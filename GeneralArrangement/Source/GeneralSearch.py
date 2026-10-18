@@ -202,8 +202,8 @@ def find_first_dominance_failure(n, mode, max_degree=None, min_degree=None,
 def report_first_dominance_failure(n, mode, max_degree=None, min_degree=None, connected=True):
     """Print the first graph on n vertices that fails the requested property."""
     mode_labels = {
-        0: "D_1 (static dominates sequential)",
-        1: "D_2 (sequential dominates static)",
+        0: "D_1 (sequential dominates static)",
+        1: "D_2 (static dominates sequential)",
         2: "neither D_1 nor D_2 (crossing)",
     }
 
