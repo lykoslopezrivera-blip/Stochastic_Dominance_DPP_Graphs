@@ -136,34 +136,34 @@ def analyze_graph_dominance(adjacency_matrix, tolerance=1e-9):
     cumulative_seq = np.cumsum(seq_probs)
 
     # Print cumulative distribution table.
-    print(f"{'k':>4} | {'Cum_stat':>12} | {'Cum_seq':>12}")
-    print("-" * 34)
-    for i, k in enumerate(ks):
-        print(f"{k:>4} | {cumulative_stat[i]:>12.6f} | {cumulative_seq[i]:>12.6f}")
+    #print(f"{'k':>4} | {'Cum_stat':>12} | {'Cum_seq':>12}")
+    #print("-" * 34)
+    #for i, k in enumerate(ks):
+    #    print(f"{k:>4} | {cumulative_stat[i]:>12.6f} | {cumulative_seq[i]:>12.6f}")
 
     # Check D_1 / D_2 stochastic dominance, with tolerance for floating-point noise.
     d1_holds = all(cumulative_stat[i] >= cumulative_seq[i] - tolerance for i in range(len(ks)))
     d2_holds = all(cumulative_seq[i] >= cumulative_stat[i] - tolerance for i in range(len(ks)))
-
-    print()
+     
+    
     if d1_holds and d2_holds:
-        print("Both cumulative distributions coincide (D_1 and D_2 both hold).")
+        Conclusion ="Both cumulative distributions coincide (D_1 and D_2 both hold)."
     elif d1_holds:
-        print("D_1 holds: the sequential model dominates the static model.")
+        Conclusion ="D_1 holds: the sequential model dominates the static model."
     elif d2_holds:
-        print("D_2 holds: the static model dominates the sequential model.")
+        Conclusion ="D_2 holds: the static model dominates the sequential model."
     else:
-        print("Neither D_1 nor D_2 holds: the cumulative distributions cross.")
+        Conclusion ="Neither D_1 nor D_2 holds: the cumulative distributions cross."
 
     # Plot cumulative distributions.
-    plt.figure(figsize=(10, 6))
-    plt.plot(ks, cumulative_stat, label="Static model", marker='o', color="blue")
-    plt.plot(ks, cumulative_seq, label="Sequential model", marker='x', color="red")
-    plt.xlabel("Maximum number of occupied nodes")
-    plt.ylabel("Cumulative probability")
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    #plt.figure(figsize=(10, 6))
+    #plt.plot(ks, cumulative_stat, label="Static model", marker='o', color="blue")
+    #plt.plot(ks, cumulative_seq, label="Sequential model", marker='x', color="red")
+    #plt.xlabel("Maximum number of occupied nodes")
+    #plt.ylabel("Cumulative probability")
+    #plt.legend()
+    #plt.grid(True)
+    #plt.show()
 
     return {
         "ks": ks,
@@ -171,6 +171,7 @@ def analyze_graph_dominance(adjacency_matrix, tolerance=1e-9):
         "seq_probs": seq_probs,
         "cumulative_stat": cumulative_stat,
         "cumulative_seq": cumulative_seq,
+        "stochastic_dominance": Conclusion
     }
 
 

@@ -196,7 +196,7 @@ def find_first_dominance_failure(n, mode, max_degree=None, min_degree=None,
                 "min_degree": min(degrees),
             }
 
-    return None
+    return [adyacence for adyacence in generate_symmetric_matrices(n, max_degree, min_degree, connected)]
 
 
 def report_first_dominance_failure(n, mode, max_degree=None, min_degree=None, connected=True):
@@ -223,11 +223,3 @@ def report_first_dominance_failure(n, mode, max_degree=None, min_degree=None, co
 
     return result
 
-
-# Example usage:
-N = 15
-MAX_DEGREE = 3     # set to None to leave the max degree unbounded
-MIN_DEGREE = None  # set to None to leave the min degree unbounded
-MODE = 0           # 0 = D_1 fails, 1 = D_2 fails, 2 = neither holds
-
-# report_first_dominance_failure(N, MODE, max_degree=MAX_DEGREE, min_degree=MIN_DEGREE)
