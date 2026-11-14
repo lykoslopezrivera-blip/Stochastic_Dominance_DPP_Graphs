@@ -141,24 +141,17 @@ def generate_symmetric_matrices(n, max_degree=None, min_degree=None, connected=T
         if line:
             yield _graph6_to_matrix(line)
 
-
 def find_first_dominance_failure(n, mode, max_degree=None, min_degree=None,
                                   connected=True, tolerance=1e-9):
-    """
-    Scan all graphs on n vertices (optionally degree-bounded) and return the
-    first one that fails the requested stochastic dominance property.
-
-    mode:
-        0 - first graph where D_1 fails (static does NOT dominate sequential)
-        1 - first graph where D_2 fails (sequential does NOT dominate static)
-        2 - first graph where NEITHER D_1 nor D_2 holds (a genuine crossing)
-
-    Returns a dict with the adjacency matrix, number of vertices, max degree
-    and min degree of the first matching graph, or None if no graph in the
-    generated set matches.
-    """
     if mode not in (0, 1, 2):
         raise ValueError("mode must be 0, 1, or 2")
+
+    total = 0
+    num_D1_only = 0
+    num_D2_only = 0
+    num_crossing = 0
+    num_same = 0
+    first_failure = None
 
     for adjacency_matrix in generate_symmetric_matrices(n, max_degree, min_degree, connected):
         sequences = enumerate_blocking_sequences(adjacency_matrix)
@@ -181,26 +174,41 @@ def find_first_dominance_failure(n, mode, max_degree=None, min_degree=None,
             if cumulative_seq < cumulative_stat - tolerance:
                 d2_holds = False
 
+        total += 1
+        if d1_holds and d2_holds:
+            num_same += 1
+        elif d1_holds:
+            num_D1_only += 1
+        elif d2_holds:
+            num_D2_only += 1
+        else:
+            num_crossing += 1
+
         failure_found = (
             (mode == 0 and not d1_holds) or
             (mode == 1 and not d2_holds) or
             (mode == 2 and not d1_holds and not d2_holds)
         )
 
-        if failure_found:
+        if failure_found and first_failure is None:
             degrees = [sum(row) for row in adjacency_matrix]
-            return {
+            first_failure = {
                 "adjacency_matrix": adjacency_matrix,
                 "num_vertices": len(adjacency_matrix),
                 "max_degree": max(degrees),
                 "min_degree": min(degrees),
             }
 
-    return [adyacence for adyacence in generate_symmetric_matrices(n, max_degree, min_degree, connected)]
-
+    return {
+        "first_failure": first_failure,
+        "total": total,
+        "same_distribution": num_same,
+        "only_D1": num_D1_only,
+        "only_D2": num_D2_only,
+        "crossing": num_crossing,
+    }
 
 def report_first_dominance_failure(n, mode, max_degree=None, min_degree=None, connected=True):
-    """Print the first graph on n vertices that fails the requested property."""
     mode_labels = {
         0: "D_1 (sequential dominates static)",
         1: "D_2 (static dominates sequential)",
@@ -209,17 +217,23 @@ def report_first_dominance_failure(n, mode, max_degree=None, min_degree=None, co
 
     result = find_first_dominance_failure(n, mode, max_degree, min_degree, connected)
 
-    if result is None:
+    print(f"Graphs analyzed (n={n}): {result['total']}")
+    print(f"  Same distribution:  {result['same_distribution']}")
+    print(f"  Only D_1 holds:     {result['only_D1']}")
+    print(f"  Only D_2 holds:     {result['only_D2']}")
+    print(f"  Neither (crossing): {result['crossing']}")
+
+    failure = result["first_failure"]
+    if failure is None:
         print(f"No graph on {n} vertices failed {mode_labels[mode]}.")
-        return None
+        return result
 
     print(f"First graph failing {mode_labels[mode]}:")
-    print(f"  Number of vertices: {result['num_vertices']}")
-    print(f"  Max degree: {result['max_degree']}")
-    print(f"  Min degree: {result['min_degree']}")
+    print(f"  Number of vertices: {failure['num_vertices']}")
+    print(f"  Max degree: {failure['max_degree']}")
+    print(f"  Min degree: {failure['min_degree']}")
     print("  Adjacency matrix:")
-    for row in result["adjacency_matrix"]:
+    for row in failure["adjacency_matrix"]:
         print(f"    {row}")
 
-    return result
-
+    return result    
