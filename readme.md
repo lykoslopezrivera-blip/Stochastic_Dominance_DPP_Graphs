@@ -11,7 +11,7 @@ The repository contains the exact computations used in the paper to compare the 
 
 
 ## Repository structure
-
+```text
 Stochastic_Dominance_DPP_Graphs/
 ├── GeneralArrangement/
 │   ├── Notebooks/
@@ -28,10 +28,11 @@ Stochastic_Dominance_DPP_Graphs/
 │       └── Verify_General_D_1.py
 ├── LinearArrangement/
 │   ├── Estimates_EN.ipynb
-│   ├── r_n_monoticity.ipynb
+│   └── r_n_monoticity.ipynb
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+```
 
 
 ### Requirements
